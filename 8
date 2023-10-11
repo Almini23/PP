@@ -1,0 +1,38 @@
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <omp.h>
+
+int main() {
+    const int size = 16000;
+    std::vector<int> a(size);
+    std::vector<float> b(size);
+
+    // Инициализация массива a
+    for (int i = 0; i < size; i++) {
+        a[i] = i;
+    }
+
+    // Вычисление результирующего массива b с использованием разных типов распределения работ
+    std::vector<std::chrono::duration<double>> durations(4);
+
+    for (int schedule = 0; schedule < 4; schedule++) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        #pragma omp parallel for schedule(schedule, 1) num_threads(8)
+        for (int i = 1; i < size - 1; i++) {
+            b[i] = (a[i - 1] + a[i] + a[i + 1]) / 3.0;
+        }
+
+        auto end = std::chrono::high_resolution_clock::now();
+        durations[schedule] = end - start;
+    }
+
+    // Вывод времени выполнения для разных типов распределения работ
+    std::cout << "Static schedule: " << durations[0].count() << " seconds" << std::endl;
+    std::cout << "Dynamic schedule: " << durations[1].count() << " seconds" << std::endl;
+    std::cout << "Guided schedule: " << durations[2].count() << " seconds" << std::endl;
+    std::cout << "Auto schedule: " << durations[3].count() << " seconds" << std::endl;
+
+    return 0;
+}
