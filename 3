@@ -1,0 +1,35 @@
+#include <iostream>
+#include <omp.h>
+
+int main() {
+    int a = 10;
+    int b = 5;
+
+    std::cout << "Before parallel region 1: a = " << a << ", b = " << b << std::endl;
+
+    #pragma omp parallel num_threads(2) private(a) firstprivate(b)
+    {
+        int threadNum = omp_get_thread_num();
+        a += threadNum;
+        b += threadNum;
+
+        std::cout << "Inside parallel region 1: Thread " << threadNum << " of 2 - a = " << a << ", b = " << b << std::endl;
+    }
+
+    std::cout << "After parallel region 1: a = " << a << ", b = " << b << std::endl;
+
+    std::cout << "Before parallel region 2: a = " << a << ", b = " << b << std::endl;
+
+    #pragma omp parallel num_threads(4) shared(a) private(b)
+    {
+        int threadNum = omp_get_thread_num();
+        a -= threadNum;
+        b -= threadNum;
+
+        std::cout << "Inside parallel region 2: Thread " << threadNum << " of 4 - a = " << a << ", b = " << b << std::endl;
+    }
+
+    std::cout << "After parallel region 2: a = " << a << ", b = " << b << std::endl;
+
+    return 0;
+}
