@@ -9,16 +9,25 @@ int main() {
     {
         int threadNum = omp_get_thread_num();
         int numThreads = omp_get_num_threads();
-        std::cout << "Parallel region 1: Thread " << threadNum << " of " << numThreads << std::endl;
+
+#pragma omp critical
+        {
+            std::cout << "Parallel area 1: Thread " << threadNum << " of " << numThreads << std::endl;
+        }
     }
 
 #pragma omp parallel if(numThreads2 > 2) num_threads(numThreads2)
     {
         int threadNum = omp_get_thread_num();
         int numThreads = omp_get_num_threads();
-        std::cout << "Parallel region 2: Thread " << threadNum << " of " << numThreads << std::endl;
+
+#pragma omp critical
+        {
+            std::cout << "Parallel area 2: Thread " << threadNum << " of " << numThreads << std::endl;
+        }
     }
 
     return 0;
 }
+
 
